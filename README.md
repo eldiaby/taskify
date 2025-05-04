@@ -10,19 +10,19 @@ Task Manager application built with Node.js, Express, and MongoDB. Supports user
 
 ## ✅ Setup Basic Express Server
 
-- [ ] import express and create app
-- [ ] set port (5000) and setup listen
-- [ ] setup express.json() middleware
-- [ ] install & use dotenv for environment variables
+- [x] import express and create app
+- [x] set port (5000) and setup listen
+- [x] setup express.json() middleware
+- [x] install & use dotenv for environment variables
 
 ---
 
 ## ✅ Connect to MongoDB
 
-- [ ] install mongoose
-- [ ] setup `.env` with `MONGO_URI`
-- [ ] create `db.js` file in `config/` and connect
-- [ ] import and call it in server.js
+- [x] install mongoose
+- [x] setup `.env` with `MONGO_URI`
+- [x] create `db.js` file in `config/` and connect
+- [x] import and call it in server.js
 
 ---
 
@@ -30,9 +30,9 @@ Task Manager application built with Node.js, Express, and MongoDB. Supports user
 
 ### User Model
 
-- [ ] name, email, password fields
-- [ ] validate email (validator.js)
-- [ ] hash password using bcrypt before save
+- [x] name, email, password fields
+- [x] validate email (validator.js)
+- [x] hash password using bcrypt before save
 
 ### Register & Login
 

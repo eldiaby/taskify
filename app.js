@@ -2,7 +2,7 @@
 require('dotenv').config({ path: './config.env' });
 
 /* ─────────────────────────────────────────────────────── */
-/* 📦 Core Package */
+/* 📦 Core Packages */
 /* ─────────────────────────────────────────────────────── */
 const express = require('express'); // Import the express framework to create the server
 const app = express(); // Initialize the express application
@@ -10,14 +10,23 @@ const morgan = require('morgan'); // Import morgan for logging HTTP requests
 // const cors = require('cors'); // Import cors for Cross-Origin Resource Sharing
 
 /* ─────────────────────────────────────────────────────── */
+/* 🛠️ Custom Middleware */
+/* ─────────────────────────────────────────────────────── */
+const notFoundMiddleware = require('./middleware/notFoundHandlerMiddleware.js'); // Import custom 404 middleware
+const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware'); // Import custom error handling middleware
+
+/* ─────────────────────────────────────────────────────── */
 /* 🌐 App Configuration */
 /* ─────────────────────────────────────────────────────── */
 const port = process.env.PORT || 5000; // Set the port, using the one from environment variables or default to 5000
 
 /* ─────────────────────────────────────────────────────── */
-/* 🛠️ Custom Modules */
+/* 🧰 Custom Modules */
 /* ─────────────────────────────────────────────────────── */
-const connectDB = require('./db/connectDB'); // Import custom database connection module
+const connectDB = require('./db/server.js'); // Import custom database connection module
+
+// Routes
+const authRouter = require('./routes/authRoutes.js');
 
 /* ─────────────────────────────────────────────────────── */
 /* 🔍 Dev Logging (only in development mode) */
@@ -30,7 +39,15 @@ if (process.env.NODE_ENV === 'development') {
 /* 🧰 Global Middleware */
 /* ─────────────────────────────────────────────────────── */
 app.use(express.json()); // Middleware to parse incoming JSON payloads from requests
-app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded data (useful for form submissions)
+
+// app routings
+app.use('/api/v1/auth', authRouter);
+
+/* ─────────────────────────────────────────────────────── */
+/* ⚠️ Error Handling Middleware */
+/* ─────────────────────────────────────────────────────── */
+app.use(notFoundMiddleware); // Middleware to handle 404 errors
+// app.use(errorHandlerMiddleware); // Middleware to handle other errors
 
 /* ─────────────────────────────────────────────────────── */
 /* 🚀 Start the Server and Connect to DB */
