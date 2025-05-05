@@ -27,6 +27,7 @@ const connectDB = require('./db/server.js'); // Import custom database connectio
 
 // Routes
 const authRouter = require('./routes/authRoutes.js');
+const cookieParser = require('cookie-parser');
 
 /* ─────────────────────────────────────────────────────── */
 /* 🔍 Dev Logging (only in development mode) */
@@ -40,7 +41,14 @@ if (process.env.NODE_ENV === 'development') {
 /* ─────────────────────────────────────────────────────── */
 app.use(express.json()); // Middleware to parse incoming JSON payloads from requests
 
+app.use(cookieParser(process.env.JWT_SECRET_KEY)); // Middleware to parse cookies from requests
+
 // app routings
+
+// app.use('/', (req, res) => {
+//   res.send('API is working'); // Test route to check if the API is working
+// });
+
 app.use('/api/v1/auth', authRouter);
 
 /* ─────────────────────────────────────────────────────── */
