@@ -13,7 +13,7 @@ const morgan = require('morgan'); // Import morgan for logging HTTP requests
 /* 🛠️ Custom Middleware */
 /* ─────────────────────────────────────────────────────── */
 const notFoundMiddleware = require('./middleware/notFoundHandlerMiddleware.js'); // Import custom 404 middleware
-const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware'); // Import custom error handling middleware
+const errorHandlerMiddleware = require('./middleware/error-handler.js'); // Import custom error handling middleware
 
 /* ─────────────────────────────────────────────────────── */
 /* 🌐 App Configuration */
@@ -55,7 +55,7 @@ app.use('/api/v1/auth', authRouter);
 /* ⚠️ Error Handling Middleware */
 /* ─────────────────────────────────────────────────────── */
 app.use(notFoundMiddleware); // Middleware to handle 404 errors
-// app.use(errorHandlerMiddleware); // Middleware to handle other errors
+app.use(errorHandlerMiddleware); // Middleware to handle other errors
 
 /* ─────────────────────────────────────────────────────── */
 /* 🚀 Start the Server and Connect to DB */
