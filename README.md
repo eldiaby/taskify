@@ -36,25 +36,25 @@ Task Manager application built with Node.js, Express, and MongoDB. Supports user
 
 ### Register & Login
 
-- [ ] POST `/api/v1/auth/register`
-- [ ] POST `/api/v1/auth/login`
-- [ ] Validate input and return error if missing
-- [ ] Return token in secure cookie
-- [ ] JWT_SECRET and JWT_LIFETIME in .env
+- [x] POST `/api/v1/auth/register`
+- [x] POST `/api/v1/auth/login`
+- [x] Validate input and return error if missing
+- [x] Return token in secure cookie
+- [x] JWT_SECRET and JWT_LIFETIME in .env
 
 ### Logout
 
-- [ ] GET `/api/v1/auth/logout`
-- [ ] Clear cookie token
+- [x] GET `/api/v1/auth/logout`
+- [x] Clear cookie token
 
 ---
 
 ## ✅ Authentication & Authorization
 
-- [ ] Create JWT utils (sign, verify)
-- [ ] Attach token to response cookie
-- [ ] Create authMiddleware to protect routes
-- [ ] Create permission check function (optional)
+- [x] Create JWT utils (sign, verify)
+- [x] Attach token to response cookie
+- [x] Create authMiddleware to protect routes
+- [x] Create permission check function (optional)
 
 ---
 
