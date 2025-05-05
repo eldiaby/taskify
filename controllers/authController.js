@@ -1,43 +1,57 @@
+// ======================================
+// ========== Required Dependencies =====
+// ======================================
 const asyncHandler = require('express-async-handler');
+const { StatusCodes } = require('http-status-codes');
+const CustomError = require('../errors');
+
+// ======================================
+// ========== Utility Functions =========
+// ======================================
 const { createTokenUser } = require('../utils/createTokenUser');
-const { StatusCodes } = require('http-status-codes'); // Importing the StatusCodes object from the http-status-codes package
-const { createToken } = require('../utils/createToken.js'); // Importing the createToken function from the utils folder
-
-const CustomError = require('../errors'); // Importing the CustomError class from the errors folder
-
+const { createToken } = require('../utils/createToken.js');
 const {
   attachCookiesToResponse,
-} = require('../utils/attachCookiesToResponse.js'); // Importing the attachCookiesToResponse function from the utils folder
+} = require('../utils/attachCookiesToResponse.js');
 
+// ======================================
+// ========== User Model ===============
+// ======================================
 const User = require('../models/userModel');
 
-module.exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, passwordConfirm } = req.body; // Destructure name, email, and password from request body
+// ======================================
+// ========== Register Controller =======
+// ======================================
 
-  // Check if all required fields are provided
+/**
+ * @function register
+ * @desc Handles user registration
+ * @route POST /api/auth/register
+ * @access Public
+ */
+module.exports.register = asyncHandler(async (req, res, next) => {
+  const { name, email, password, passwordConfirm } = req.body;
+
+  // Validate required fields
   if (!name || !email || !password || !passwordConfirm) {
-    // If any field is missing, send a 400 Bad Request response
     throw new CustomError.BadRequestError('Please provide all required fields');
   }
 
-  const newUser = {
-    name,
-    email,
-    password,
-    passwordConfirm,
-  };
+  // Check if email already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw new CustomError.BadRequestError('Email is already registered');
+  }
 
-  const user = await User.create(newUser);
+  // Create new user
+  const user = await User.create({ name, email, password, passwordConfirm });
 
-  const tokenUser = createTokenUser(user); // Create a token user object from the user data
-
-  const token = createToken({ payload: tokenUser }); // Create a JWT token using the token user object
-  // Set the token in the response cookie with a 30-day expiration time
-
+  // Generate token and attach to cookies
+  const tokenUser = createTokenUser(user);
+  const token = createToken({ payload: tokenUser });
   attachCookiesToResponse({ res, token });
 
-  // Send a 201 Created response with the user data
-  // and a success message
+  // Send response
   res.status(StatusCodes.CREATED).json({
     status: 'success',
     message: 'User registered successfully',
@@ -45,43 +59,43 @@ module.exports.register = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports.login = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body; // Destructure email and password from request body
+// ======================================
+// =========== Login Controller =========
+// ======================================
 
-  // Check if both email and password are provided
+/**
+ * @function login
+ * @desc Handles user login
+ * @route POST /api/auth/login
+ * @access Public
+ */
+module.exports.login = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Validate input
   if (!email || !password) {
-    // If any field is missing, send a 400 Bad Request response
     throw new CustomError.BadRequestError(
       'Please provide both email and password'
     );
   }
 
-  // Find the user by email and select the password field
+  // Find user by email and compare password
   const user = await User.findOne({ email }).select('+password');
-
   if (!user) {
-    // If user is not found, send a 401 Unauthorized response
     throw new CustomError.UnauthenticatedError('Invalid credentials');
   }
 
-  // Check if the password is correct
-  const isPasswordCorrect = await user.comparePassword(password); // Compare the provided password with the stored hashed password
-
+  const isPasswordCorrect = await user.comparePassword(password);
   if (!isPasswordCorrect) {
-    // If the password is incorrect, send a 401 Unauthorized response
     throw new CustomError.UnauthenticatedError('Invalid credentials');
   }
 
-  // Create a token user object from the user data
+  // Generate token and attach to cookies
   const tokenUser = createTokenUser(user);
-
-  // Create a JWT token using the token user object
   const token = createToken({ payload: tokenUser });
-
-  // Attach the token to response cookies
   attachCookiesToResponse({ res, token });
 
-  // Send response with user data and token
+  // Send response
   res.status(StatusCodes.OK).json({
     status: 'success',
     message: 'User logged in successfully',
@@ -89,12 +103,23 @@ module.exports.login = asyncHandler(async (req, res, next) => {
   });
 });
 
+// ======================================
+// =========== Logout Controller =========
+// ======================================
+
+/**
+ * @function logout
+ * @desc Logs the user out by clearing the token cookie
+ * @route GET /api/auth/logout
+ * @access Public
+ */
 module.exports.logout = asyncHandler(async (req, res, next) => {
+  // Clear cookie by expiring it
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None',
-    expires: new Date(Date.now()) + 15 * 1000, // 15 seconds
+    expires: new Date(Date.now() + 15 * 1000),
   });
 
   res.status(StatusCodes.OK).json({
